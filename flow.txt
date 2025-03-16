@@ -1,0 +1,31 @@
+📌 JWT Authentication Flow for CLI & API
+
+1️⃣ CLI Requests Authentication URL
+The CLI starts the authentication process by requesting the Google OAuth authorization URL from the API.
+The API generates the URL with the client ID and sends it to the CLI.
+The CLI displays this URL to the user.
+
+2️⃣ User Authenticates via Google
+The user logs in with Google in their browser.
+After logging in, Google redirects them to the API’s callback URL with an auth code.
+
+3️⃣ API Exchanges Auth Code for Access Token
+The API takes the received auth code and exchanges it with Google for an access token and an ID token (JWT).
+
+4️⃣ API Verifies Google JWT Token
+The API extracts and validates the JWT ID token from Google.
+It verifies the signature and checks claims (e.g., aud must match the API’s client ID).
+If the JWT is valid, the API retrieves the user info (Google user ID, email, etc.).
+
+5️⃣ API Issues Its Own JWT for CLI
+After validation, the API creates its own JWT (signed with its secret key).
+This JWT represents the authenticated user in the API’s system.
+The API sends this JWT back to the CLI.
+
+6️⃣ CLI Stores API JWT & Uses It for Future Requests
+The CLI stores the API’s JWT in memory or a file.
+When making requests to the API, the CLI includes the JWT in the Authorization header.
+
+7️⃣ API Secures Endpoints with JWT
+The API validates the received JWT for every secured endpoint.
+If valid, it grants access; otherwise, it rejects the request.
