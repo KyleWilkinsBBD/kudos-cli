@@ -33,8 +33,8 @@ public class AuthClient {
         return Optional.ofNullable(clientId);
     }
 
-    public String getAuthCodeFromUser(String clientId) throws Exception{
-        String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
+    public void getAuthCodeFromUser(String clientId) throws Exception{
+        String REDIRECT_URI = "http://localhost:8090/auth_code";
         String AUTH_URL = "https://accounts.google.com/o/oauth2/auth" +
                 "?client_id=" + clientId +
                 "&redirect_uri=" + REDIRECT_URI +
@@ -50,10 +50,10 @@ public class AuthClient {
             System.out.println(AUTH_URL);
         }
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the authorisation code: ");
-
-        return scanner.nextLine().trim();
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.println("Enter the authorisation code: ");
+//
+//        return scanner.nextLine().trim();
     }
 
     public Map sendAuthCodeToApi(String authCode){
