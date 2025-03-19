@@ -1,6 +1,8 @@
 package com.bbdgrads.kudos_cli.service;
 
 import com.bbdgrads.kudos_cli.config.AuthState;
+import com.bbdgrads.kudos_cli.model.Team;
+import com.bbdgrads.kudos_cli.model.UserSession;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.server.reactive.HttpHandler;
 import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter;
@@ -18,14 +20,17 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 @Service
 public class StartupService {
 
+
     private final AuthService authClient;
     private final AuthState authState;
+    private final UserSession userSession;
     private String authCode;
     private CountDownLatch latch = new CountDownLatch(1);
 
-    public StartupService(AuthService authClient, AuthState authState) {
+    public StartupService(AuthService authClient, AuthState authState, UserSession userSession) {
         this.authClient = authClient;
         this.authState = authState;
+        this.userSession = userSession;
     }
 
     @PostConstruct
@@ -52,7 +57,9 @@ public class StartupService {
                 if(response.isPresent()){
                     proceed = true;
                     authState.setAPI_KEY(response.get().get("API-KEY").toString());
-                    authClient.testAuth(response.get().get("API-KEY").toString());
+                    //authClient.testAuth(response.get().get("API-KEY").toString());
+                    populateUserSession(response.get().get("user"));
+                    System.out.println(String.format("Welcome, %s, to kudo api! \n", userSession.getUsername()));
                 } else{
                     System.err.println("Invalid Auth Code, Please Try Again...\n\n");
                     latch = new CountDownLatch(1);
@@ -85,5 +92,24 @@ public class StartupService {
                 .bindNow();  // Bind the server
 
         System.out.println("OAuth server started on http://localhost:8090/auth_code");
+    }
+
+    public void populateUserSession(Object userObj){
+        if (userObj instanceof Map) {
+            Map<String, Object> userMap = (Map<String, Object>) userObj;
+
+            userSession.setUserId(((Number) userMap.get("userId")).longValue()); // Convert to Long
+            userSession.setUsername((String) userMap.get("username"));
+            userSession.setGoogleId((String) userMap.get("googleId"));
+            userSession.setAdmin((Boolean) userMap.get("admin"));
+
+            // Extract the team object properly
+            Object teamObj = userMap.get("team");
+            if (teamObj instanceof Team) {
+                userSession.setTeamName(((Team) teamObj).getTeam_name()); // Get team name
+            } else {
+                userSession.setTeamName(null); // Handle null or unexpected types
+            }
+        }
     }
 }

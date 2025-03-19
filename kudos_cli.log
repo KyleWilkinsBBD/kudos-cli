@@ -5,3 +5,29 @@
 1742370272369:help
 1742370286772:hihi
 1742370945933:token
+1742391591366:create_user Gregory_Maselle 011011011011
+1742391604540:exit
+1742392040213:create_user tester_1 114120506185265385260
+1742392204183:create_user tester1 114120506185265385260
+1742392647470:create_user tester_1 114120506185265385260
+1742393086214:create_user tester1 12345678
+1742393151632:create_user test 123456789
+1742393295618:create_user test 12345678
+1742394376335:my_team
+1742395654208:create_user test 123456789
+1742398519282:create_user test1 1234567
+1742398544189:my_team
+1742399020803:users_in_team "Alpha Team"
+1742402201037:upgradeToAdmin Kyle_Wilkins_1
+1742402406149:upgradeToAdmin "Kyle_Wilkins_1"
+1742403421584:updateToAdmin "Kyle_Wilkins_1"
+1742403437773:upgradeToAdmin "Kyle_Wilkins_1"
+1742403609267:find_users_team AdminUser_1
+1742403866678:addUserToTeam "Gregory_Maselle_1" "Alpha Team"
+1742405898932:token
+1742405913798:create_user "bobby" 123456789
+1742405927944:my_team
+1742405954807:users_in_team "Alpha Team"
+1742405982117:upgrade_to_admin "Kyle_Wilkins_1"
+1742406026066:find_users_team AdminUser_1
+1742406047433:add_user_to_team "Gregory_Maselle_1" "Alpha Team"
