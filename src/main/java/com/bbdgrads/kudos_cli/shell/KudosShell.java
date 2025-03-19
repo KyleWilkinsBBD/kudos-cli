@@ -16,18 +16,13 @@ public class KudosShell {
         this.kudosService = kudosService;
     }
 
-    @ShellMethod(key="hihi")
-    public String sayHello(){
-        return "HiHi!";
-    }
-
-    @ShellMethod(key = "kudos")
+    @ShellMethod(key = "kudos", value = "view kudos for self or another user (specify -u 'username' for another user)")
     public String viewKudos(@ShellOption(value = "-u", defaultValue = "") String user){
 
         return kudosService.fetchAllKudos(user);
     }
 
-    @ShellMethod(key = "send")
+    @ShellMethod(key = "send", value = "send kudos to someone (-u 'username of recipient' -m for message")
     public String sendKudo(@ShellOption(value = "-u") String targetUser,
                            @ShellOption(value = "-m") String message){
        Optional<Object> newKudo =  kudosService.sendKudo(targetUser, message);
