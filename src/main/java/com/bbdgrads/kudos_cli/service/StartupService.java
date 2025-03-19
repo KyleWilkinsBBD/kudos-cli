@@ -1,6 +1,5 @@
 package com.bbdgrads.kudos_cli.service;
 
-import com.bbdgrads.kudos_cli.auth.AuthClient;
 import com.bbdgrads.kudos_cli.config.AuthState;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.server.reactive.HttpHandler;
@@ -19,39 +18,52 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 @Service
 public class StartupService {
 
-    private final AuthClient authClient;
+    private final AuthService authClient;
     private final AuthState authState;
     private String authCode;
     private CountDownLatch latch = new CountDownLatch(1);
 
-    public StartupService(AuthClient authClient, AuthState authState) {
+    public StartupService(AuthService authClient, AuthState authState) {
         this.authClient = authClient;
         this.authState = authState;
     }
 
     @PostConstruct
-    public void authenticationStartup(){
+    public void authenticationStartup() throws InterruptedException {
         listenForAuthCallback();
-        Optional<Map> clientId = authClient.fetchGoogleClientId();
-        clientId.ifPresent(map -> {
-            boolean proceed = false;
-            while(!proceed){
-                try {
-                    authClient.getAuthCodeFromUser(map.get("client_id").toString());
-                    latch.await();
-                    Map response = authClient.sendAuthCodeToApi(authCode);
-                    if(response.containsKey("API-KEY")){
-                        proceed = true;
-                        authState.setAPI_KEY(response.get("API-KEY").toString());
-                        //authClient.testAuth(response.get("API-KEY").toString());
-                    }
-                } catch (Exception e) {
+        boolean serverOnline = false;
+        Optional<Map> clientId = Optional.empty();
+        while(!serverOnline){
+            clientId = authClient.fetchGoogleClientId();
+            if(clientId.isEmpty()){
+                System.out.println("Waiting for server response...");
+                Thread.sleep(4000);
+            } else{
+                serverOnline= true;
+            }
+        }
+        Map id = clientId.get();
+        boolean proceed = false;
+        while(!proceed){
+            try {
+                authClient.getAuthCodeFromUser(id.get("client_id").toString());
+                latch.await();
+                Optional<Map> response = authClient.sendAuthCodeToApi(authCode);
+                if(response.isPresent()){
+                    proceed = true;
+                    authState.setAPI_KEY(response.get().get("API-KEY").toString());
+                    authClient.testAuth(response.get().get("API-KEY").toString());
+                } else{
                     System.err.println("Invalid Auth Code, Please Try Again...\n\n");
                     latch = new CountDownLatch(1);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Invalid Auth Code, Please Try Again...\n\n");
+                latch = new CountDownLatch(1);
             }
+        }
 
-        });
 
     }
 

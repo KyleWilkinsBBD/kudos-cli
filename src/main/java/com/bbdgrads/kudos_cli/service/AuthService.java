@@ -1,7 +1,9 @@
-package com.bbdgrads.kudos_cli.auth;
+package com.bbdgrads.kudos_cli.service;
 
+import com.bbdgrads.kudos_cli.config.AuthState;
 import com.bbdgrads.kudos_cli.config.ClientConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -9,28 +11,20 @@ import java.awt.*;
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Scanner;
 
 @Service
-public class AuthClient {
+public class AuthService {
 
-    private final WebClient webClient;
-    private final ClientConfig config;
-    private final String baseUrl = "http://localhost:8080";
+    @Value("${kudos.api.base.url}")
+    private String baseUrl;
+    private final RequestService requestService;
 
-    @Autowired
-    public AuthClient(WebClient.Builder webClientBuilder, ClientConfig config){
-        this.webClient = webClientBuilder.build();
-        this.config = config;
+    public AuthService(RequestService requestService){
+        this.requestService = requestService;
     }
 
     public Optional<Map> fetchGoogleClientId(){
-        Map clientId = webClient.get()
-                .uri(baseUrl + "/api/client_id")
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
-        return Optional.ofNullable(clientId);
+        return requestService.getRequest("/api/client_id", Map.class);
     }
 
     public void getAuthCodeFromUser(String clientId) throws Exception{
@@ -56,22 +50,12 @@ public class AuthClient {
 //        return scanner.nextLine().trim();
     }
 
-    public Map sendAuthCodeToApi(String authCode){
-        return webClient.post()
-                .uri(baseUrl + "/api/authenticate")
-                .bodyValue(Map.of("authCode", authCode))
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+    public Optional<Map> sendAuthCodeToApi(String authCode){
+        return requestService.postRequest("/api/authenticate", Map.class, Map.of("authCode", authCode));
     }
 
     public void testAuth(String apiToken){
-        String test = webClient.get()
-                .uri(baseUrl + "/api/test-auth")
-                .header("bearer", apiToken)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        System.out.println(test);
+        Optional<String> test = requestService.getRequest("/api/test-auth", String.class);
+        test.ifPresent(System.out::println);
     }
 }
