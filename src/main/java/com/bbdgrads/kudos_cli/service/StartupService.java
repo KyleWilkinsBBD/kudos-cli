@@ -1,6 +1,7 @@
 package com.bbdgrads.kudos_cli.service;
 
 import com.bbdgrads.kudos_cli.config.AuthState;
+import com.bbdgrads.kudos_cli.model.Team;
 import com.bbdgrads.kudos_cli.model.UserSession;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.server.reactive.HttpHandler;
@@ -100,8 +101,15 @@ public class StartupService {
             userSession.setUserId(((Number) userMap.get("userId")).longValue()); // Convert to Long
             userSession.setUsername((String) userMap.get("username"));
             userSession.setGoogleId((String) userMap.get("googleId"));
-            userSession.setTeamName((String) userMap.get("team")); // Can be null
             userSession.setAdmin((Boolean) userMap.get("admin"));
+
+            // Extract the team object properly
+            Object teamObj = userMap.get("team");
+            if (teamObj instanceof Team) {
+                userSession.setTeamName(((Team) teamObj).getTeam_name()); // Get team name
+            } else {
+                userSession.setTeamName(null); // Handle null or unexpected types
+            }
         }
     }
 }

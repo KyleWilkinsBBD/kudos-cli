@@ -1,0 +1,38 @@
+name: Release
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+env:
+  build-number: ${{ github.run_number }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '23'
+          distribution: 'temurin'
+          cache: 'maven'
+      - run: mvn clean package -DskipTests
+      - run: ls -la target/
+      - run: |
+          mkdir staging
+          mv target/kudos_cli-0.0.1-SNAPSHOT.jar target/kudos_cli-${{ github.run_number }}.jar
+          cp target/*.jar staging/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Package
+          path: staging
+          retention-days: 1
+      - uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ github.run_number }}"
+          title: "Automated Build ${{ github.run_number }}"
+          prerelease: true
+          files: staging/*.jar
