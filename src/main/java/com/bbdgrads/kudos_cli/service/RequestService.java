@@ -58,5 +58,39 @@ public class RequestService {
         }
     }
 
+    public <T> Optional<T> patchRequest(String url, Class<T> responseType, Map<String, String> dataBody){
+        try{
+            return Optional.ofNullable(webClient.patch()
+                    .uri(baseEndpoint + url)
+                    .bodyValue(dataBody)
+                    .header("Authorization", "Bearer " + authState.getAPI_KEY())
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, response -> response.bodyToMono(String.class)
+                            .flatMap(errorBody -> Mono.error(new RuntimeException("API Error: " + errorBody))))
+                    .bodyToMono(responseType)
+                    .block());
+        } catch (Exception e){
+            System.err.println("Error making GET request: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public <T> Optional<T> putRequest(String url, Class<T> responseType, Map<String, String> dataBody){
+        try{
+            return Optional.ofNullable(webClient.put()
+                    .uri(baseEndpoint + url)
+                    .bodyValue(dataBody)
+                    .header("Authorization", "Bearer " + authState.getAPI_KEY())
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, response -> response.bodyToMono(String.class)
+                            .flatMap(errorBody -> Mono.error(new RuntimeException("API Error: " + errorBody))))
+                    .bodyToMono(responseType)
+                    .block());
+        } catch (Exception e){
+            System.err.println("Error making GET request: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
 
 }
