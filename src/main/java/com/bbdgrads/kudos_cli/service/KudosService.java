@@ -46,8 +46,8 @@ public class KudosService {
         for (Map<String, Object> kudo : kudosList) {
             sb.append("\n\tKudo ID: ").append(kudo.get("kudoId")).append("\n")
                     .append("\tMessage: ").append(formatMessage((String) kudo.get("message"))).append("\n")
-                    .append("\tFrom User ID: ").append(kudo.get("sendingUserId"))
-                    .append(" -> To User ID: ").append(kudo.get("targetUserId")).append("\n")
+                    .append("\tFrom User ID: ").append(kudo.get("sendingUsername"))
+                    .append(" -> To User ID: ").append(kudo.get("targetUsername")).append("\n")
                     .append("\tSent At: ").append(kudo.get("created_at")).append("\n")
                     .append("\tFlagged: ").append((boolean) kudo.get("flagged") ? "Yes" : "No")
                     .append(" | Read: ").append((boolean) kudo.get("read") ? "Yes" : "No").append("\n")
