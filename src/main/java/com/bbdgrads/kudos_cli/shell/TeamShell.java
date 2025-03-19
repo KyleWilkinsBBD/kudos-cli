@@ -13,7 +13,7 @@ public class TeamShell {
         this.teamService = teamService;
     }
 
-    @ShellMethod(key = "teams")
+    @ShellMethod(key = "teams", value = "View all teams")
     public String viewTeams(){
         return teamService.getAllTeams();
     }

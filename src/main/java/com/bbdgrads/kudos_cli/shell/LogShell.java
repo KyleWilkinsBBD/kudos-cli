@@ -14,7 +14,7 @@ public class LogShell {
         this.logService = logService;
     }
 
-    @ShellMethod(key = "logs")
+    @ShellMethod(key = "logs", value = "View logs for a user (specify -u 'username' for logs for target user and leave empty for your logs)")
     public String viewLogs(@ShellOption(value = "-u", defaultValue = "") String user){
         return logService.getLogs(user);
     }
