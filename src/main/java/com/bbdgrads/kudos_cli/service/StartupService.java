@@ -58,8 +58,10 @@ public class StartupService {
                     authState.setAPI_KEY(response.get().get("API-KEY").toString());
                     // authClient.testAuth(response.get().get("API-KEY").toString());
                     populateUserSession(response.get().get("user"));
-                    System.out.println(String.format("Welcome, %s, to kudo api! \n", userSession.getUsername()));
-                } else {
+
+                    System.out.println("\n\n---Welcome " + userSession.getUsername() + "!---\n");
+                } else{
+
                     System.err.println("Invalid Auth Code, Please Try Again...\n\n");
                     latch = new CountDownLatch(1);
                 }

@@ -21,10 +21,10 @@ public class UserShell {
         this.userSession = userSession;
     }
 
-    @ShellMethod(key = "token")
-    public String displayJwtToken() {
-        return authState.getAPI_KEY();
-    }
+//    @ShellMethod(key = "token")
+//    public String displayJwtToken() {
+//        return authState.getAPI_KEY();
+//    }
 
     @ShellMethod(key = "create_user", value = "Create a new user (admin only) - create_user [username] [google_id]")
     public String createUser(
