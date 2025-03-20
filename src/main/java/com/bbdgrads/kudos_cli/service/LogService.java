@@ -17,13 +17,21 @@ public class LogService {
         this.userSession = userSession;
     }
 
-    public String getLogs(String userId){
+    public String getLogs(String userId) {
         Optional<List> logs = Optional.empty();
-        if(userId.equals("")){ // if getting logs for self
-           logs = requestService.getRequest("/logs/acting-user/" + userSession.getUserId(), List.class);
-        } else{
+        if (userId.equals("")) { // if getting logs for self
+            logs = requestService.getRequest("/logs/acting-user/" + userSession.getUserId(), List.class);
+        } else {
             logs = requestService.getRequest("/logs/target-user/" + userId, List.class);
         }
+        return logs.map(this::formatLogs).orElse("No logs...");
+    }
+
+    public String getLogsByType(String type) {
+        Optional<List> logs = Optional.empty();
+
+        logs = requestService.getRequest("/logs/type/" + type, List.class);
+
         return logs.map(this::formatLogs).orElse("No logs...");
     }
 

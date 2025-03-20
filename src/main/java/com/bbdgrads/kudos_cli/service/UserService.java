@@ -15,62 +15,74 @@ public class UserService {
     @Autowired
     private RequestService requestService;
 
-    public String createUser(String username, String googleId){
+    public String createUser(String username, String googleId) {
         Map<String, String> params = Map.of("name", username, "googleId", googleId);
 
         Optional<String> response = requestService.postRequestWithParams("/user/create", String.class, params);
-        if (response.isPresent()){
+        if (response.isPresent()) {
             return "User Created!";
-        }
-        else{
+        } else {
             return "Failed to create user";
         }
     }
 
-    public String getTeamOfUser(String username){
-        Optional<String> response = requestService.getRequest("/user/getTeam/"+username, String.class);
-        if (response.isPresent()){
+    public String getTeamOfUser(String username) {
+        Optional<String> response = requestService.getRequest("/user/getTeam/" + username, String.class);
+        if (response.isPresent()) {
             return response.get();
-        }
-        else {
+        } else {
             return "No team";
         }
     }
 
-    public String getAllUsersInATeam(String team_name){
-        Optional<List> response = requestService.getRequest("/user/findAllByTeamName/"+team_name, List.class);
-        if (response.isPresent()){
+    public String getAllUsersInATeam(String team_name) {
+        Optional<List> response = requestService.getRequest("/user/findAllByTeamName/" + team_name, List.class);
+        if (response.isPresent()) {
             return formatUsers(response.get());
-        }
-        else {
+        } else {
             return "No users in team";
         }
     }
 
-    public String updateToAdmin(String username){
+    public String getAllOtherUsersInATeam(String team_name, String requestingUser) {
+        Optional<List> response = requestService.getRequest("/user/findAllByTeamName/" + team_name, List.class);
+        if (response.isPresent()) {
+            // Cast with the specific type parameters needed for formatUsers
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> users = (List<Map<String, Object>>) response.get();
+
+            // Remove the requesting user by comparing username values
+            users.removeIf(user -> requestingUser.equals(user.get("username")));
+
+            return formatUsers(users);
+        } else {
+            return "No users in team";
+        }
+    }
+
+    public String updateToAdmin(String username) {
         Map<String, String> params = Map.of("username", username);
-        Optional<String> response = requestService.patchRequest("/user/setUserToAdmin/"+username, String.class, params);
-        if(response.isPresent()){
+        Optional<String> response = requestService.patchRequest("/user/setUserToAdmin/" + username, String.class,
+                params);
+        if (response.isPresent()) {
             return "Success! Admin permissions granted!";
-        }
-        else{
+        } else {
             return "Failure.";
         }
     }
 
-    public String addUserToTeam(String username, String team_name){
+    public String addUserToTeam(String username, String team_name) {
         Map<String, String> params = Map.of("username", username);
-        Optional<String> response = requestService.patchRequest("/user/addUserToTeam/"+username+"/"+team_name, String.class, params);
-        if(response.isPresent()){
+        Optional<String> response = requestService.patchRequest("/user/addUserToTeam/" + username + "/" + team_name,
+                String.class, params);
+        if (response.isPresent()) {
             return "Success! Team assigned";
-        }
-        else{
+        } else {
             return "Failure.";
         }
     }
 
-    private static String formatUsers(List<Map<String, Object>> userList)
-    {
+    private static String formatUsers(List<Map<String, Object>> userList) {
         StringBuilder sb = new StringBuilder();
         for (Map<String, Object> user : userList) {
             sb.append("\n\tUser ID: ").append(user.get("userId")).append("\n")
@@ -87,11 +99,11 @@ public class UserService {
 
             sb.append("------------------------------------\n");
         }
-        return sb.toString();}
+        return sb.toString();
+    }
 
     private static String formatMessage(String message) {
-        return message.replace(",", " ");  // Replaces commas with spaces for better readability
-         }
-
+        return message.replace(",", " "); // Replaces commas with spaces for better readability
+    }
 
 }

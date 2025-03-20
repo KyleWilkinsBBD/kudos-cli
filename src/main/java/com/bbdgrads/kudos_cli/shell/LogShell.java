@@ -15,7 +15,12 @@ public class LogShell {
     }
 
     @ShellMethod(key = "logs")
-    public String viewLogs(@ShellOption(value = "-u", defaultValue = "") String user){
+    public String viewLogs(@ShellOption(value = "-u", defaultValue = "") String user) {
         return logService.getLogs(user);
+    }
+
+    @ShellMethod(key = "logs_by_type", value = "View logs by type - logs <CreateUser | DeleteUser | UpdateUserTeam | SentKudo | DeletedKudo | CreatedTeam | DeletedTeam>")
+    public String viewLogsByType(@ShellOption(value = "-u", defaultValue = "") String type) {
+        return logService.getLogsByType(type);
     }
 }
