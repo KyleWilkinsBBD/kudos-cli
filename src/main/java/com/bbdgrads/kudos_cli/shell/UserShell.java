@@ -56,6 +56,12 @@ public class UserShell {
         return userService.getTeamOfUser(username);
     }
 
+    @ShellMethod(key = "print_teammates", value = "Print the users in your team - print_teammates")
+    public String findUsersInMyTeam() {
+        var team_name = userService.getTeamOfUser(userSession.getUsername());
+        return userService.getAllOtherUsersInATeam(team_name, userSession.getUsername());
+    }
+
     @ShellMethod(key = "add_user_to_team", value = "Add a user to a team - add_user_to_team [username] [team_name]")
     public String addUserToTeam(
             @ShellOption(help = "Username") String username,

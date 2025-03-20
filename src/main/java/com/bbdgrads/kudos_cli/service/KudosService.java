@@ -19,23 +19,23 @@ public class KudosService {
         this.userSession = userSession;
     }
 
-    public String fetchAllKudos(String user){
+    public String fetchAllKudos(String user) {
 
         Optional<List> kudos = Optional.empty();
-        if(user.equals("")){
+        if (user.equals("")) {
             kudos = requestService.getRequest("/kudos/user-kudos", List.class);
         } else {
             kudos = requestService.getRequest("/kudos/getKudoByUsername/" + user, List.class);
         }
 
-        if(kudos.isPresent()){
-           return formatKudos(kudos.get());
-        } else{
+        if (kudos.isPresent()) {
+            return formatKudos(kudos.get());
+        } else {
             return "No kudos here, sad...";
         }
     }
 
-    public Optional<Object> sendKudo(String targetUsername, String message){
+    public Optional<Object> sendKudo(String targetUsername, String message) {
         Map<String, String> params = Map.of("targetUsername", targetUsername, "message", message);
         return requestService.postRequestWithParams("/kudos/create", Object.class, params);
     }
@@ -58,6 +58,6 @@ public class KudosService {
     }
 
     private static String formatMessage(String message) {
-        return message.replace(",", " ");  // Replaces commas with spaces for better readability
+        return message.replace(",", " "); // Replaces commas with spaces for better readability
     }
 }

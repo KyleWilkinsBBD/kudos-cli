@@ -20,7 +20,6 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 @Service
 public class StartupService {
 
-
     private final AuthService authClient;
     private final AuthState authState;
     private final UserSession userSession;
@@ -38,29 +37,31 @@ public class StartupService {
         listenForAuthCallback();
         boolean serverOnline = false;
         Optional<Map> clientId = Optional.empty();
-        while(!serverOnline){
+        while (!serverOnline) {
             clientId = authClient.fetchGoogleClientId();
-            if(clientId.isEmpty()){
+            if (clientId.isEmpty()) {
                 System.out.println("Waiting for server response...");
                 Thread.sleep(4000);
-            } else{
-                serverOnline= true;
+            } else {
+                serverOnline = true;
             }
         }
         Map id = clientId.get();
         boolean proceed = false;
-        while(!proceed){
+        while (!proceed) {
             try {
                 authClient.getAuthCodeFromUser(id.get("client_id").toString());
                 latch.await();
                 Optional<Map> response = authClient.sendAuthCodeToApi(authCode);
-                if(response.isPresent()){
+                if (response.isPresent()) {
                     proceed = true;
                     authState.setAPI_KEY(response.get().get("API-KEY").toString());
-                    //authClient.testAuth(response.get().get("API-KEY").toString());
+                    // authClient.testAuth(response.get().get("API-KEY").toString());
                     populateUserSession(response.get().get("user"));
+
                     System.out.println("\n\n---Welcome " + userSession.getUsername() + "!---\n");
                 } else{
+
                     System.err.println("Invalid Auth Code, Please Try Again...\n\n");
                     latch = new CountDownLatch(1);
                 }
@@ -71,30 +72,28 @@ public class StartupService {
             }
         }
 
-
     }
 
-    public void listenForAuthCallback(){
+    public void listenForAuthCallback() {
         // Start a small HTTP server to listen for the auth callback
         HttpHandler httpHandler = RouterFunctions.toHttpHandler(
                 RouterFunctions.route(GET("/auth_code"), request -> {
                     authCode = request.queryParam("code").orElse(null);
                     latch.countDown();
                     return ServerResponse.ok().bodyValue("You may close this window now.");
-                })
-        );
+                }));
 
         ReactorHttpHandlerAdapter adapter = new ReactorHttpHandlerAdapter(httpHandler);
         HttpServer.create()
                 .host("localhost")
                 .port(8090)
                 .handle(adapter)
-                .bindNow();  // Bind the server
+                .bindNow(); // Bind the server
 
         System.out.println("OAuth server started on http://localhost:8090/auth_code");
     }
 
-    public void populateUserSession(Object userObj){
+    public void populateUserSession(Object userObj) {
         if (userObj instanceof Map) {
             Map<String, Object> userMap = (Map<String, Object>) userObj;
 
