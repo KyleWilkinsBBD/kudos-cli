@@ -2,7 +2,6 @@ name: Release
 on:
   push:
     branches: [ "main" ]
-
 env:
   build-number: ${{ github.run_number }}
 jobs:
@@ -34,4 +33,5 @@ jobs:
           automatic_release_tag: "${{ github.run_number }}"
           title: "Automated Build ${{ github.run_number }}"
           prerelease: true
-          files: staging/*.jar
+          files: |
+            staging/*.jar
